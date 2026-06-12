@@ -1,0 +1,66 @@
+{
+  "_comment": "TS-IMA-CC-PC_02 — CP&H COGS Audit, multi-axis scaled-DSO contract (HS_Scaled_DSO_Test). Calculation row carries a 'scale' block with the Scale Data popup grid (TIER_GCR: GX - FLU x TIER_BPR: BPR -> Outcome). Eligibility was NOT in the source screenshots; the row below is carried over from the known-good PC_01 scenario — edit if this contract needs different eligibility. Scale 'columns' are aria-colindex values (row-number col = 1, data cols from 2); verify against the live popup if a column doesn't fill.",
+
+  "priceCompliance": {
+
+    "dates": {
+      "startDate": "07/01/2024",
+      "endDate":   "07/31/2024"
+    },
+
+    "modal": {
+      "complianceType": "CP&H COGS Audit (CP&H COGS Audit)",
+      "description":    "HS_Scaled_DSO_Test"
+    },
+
+    "generalExtras": {
+      "sourceDataType":      "Direct - Sales Data (Direct - Sales Data)",
+      "exclusiveFormula":    true,
+      "calculationFrequency": "04 (Quarterly (Mar - May))",
+      "agreementStatus":     "Active (01)",
+      "group":               "McKesson Health Systems (MHS)",
+      "contractSubgroup":    "Buying Group (BG)",
+      "origin":              "Supply Agreement (SA)",
+      "baseDso":             "17.5"
+    },
+
+    "eligibilityRows": [
+      {
+        "salesOrg":       "8000",
+        "customerNumber": "166911"
+      }
+    ],
+
+    "calculationRows": [
+      {
+        "formula1":   "TIER_GCR: GX - FLU",
+        "calcLevel1": "contract",
+        "formula2":   "TIER_BPR: BPR",
+        "calcLevel2": "contract",
+
+        "scale": {
+          "columns": {
+            "axes": [
+              { "operator": 2, "value": 3, "unit": 4 },
+              { "operator": 5, "value": 6, "unit": 7 }
+            ],
+            "scaleValue": 8,
+            "scaleUnit": 9
+          },
+          "rows": [
+            { "axes": [ { "operator": "GE", "value": "6", "unit": "% (%)" }, { "operator": "GE", "value": "0",  "unit": "% (%)" } ], "scaleValue": "-3.00", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "GE", "value": "6", "unit": "% (%)" }, { "operator": "GE", "value": "80", "unit": "% (%)" } ], "scaleValue": "-3.25", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "GE", "value": "6", "unit": "% (%)" }, { "operator": "GE", "value": "90", "unit": "% (%)" } ], "scaleValue": "-3.50", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "GE", "value": "6", "unit": "% (%)" }, { "operator": "GE", "value": "95", "unit": "% (%)" } ], "scaleValue": "-3.75", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "GE", "value": "8", "unit": "% (%)" }, { "operator": "GE", "value": "0",  "unit": "% (%)" } ], "scaleValue": "-3.00", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "GE", "value": "8", "unit": "% (%)" }, { "operator": "GE", "value": "80", "unit": "% (%)" } ], "scaleValue": "-3.50", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "GE", "value": "8", "unit": "% (%)" }, { "operator": "GE", "value": "90", "unit": "% (%)" } ], "scaleValue": "-3.75", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "GE", "value": "8", "unit": "% (%)" }, { "operator": "GE", "value": "95", "unit": "% (%)" } ], "scaleValue": "-4.00", "scaleUnit": "% (%)" }
+          ]
+        }
+      }
+    ],
+
+    "approvalStatus": "New"
+  }
+}

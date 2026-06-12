@@ -1,0 +1,38 @@
+{
+  "_comment": "TS-IMA-CC-PC_01 — Create a complete Price Compliance contract (IMA_CC_PC_01). Data-driven from JSON. 'dates' are shared by the modal, eligibility rows (validFrom/validTo) and calculation rows (startDate/endDate); any row may override by adding its own date fields. eligibilityRows and calculationRows are arrays so additional rows can be appended without touching the spec.",
+
+  "priceCompliance": {
+
+    "dates": {
+      "startDate": "01/01/2025",
+      "endDate":   "12/31/2025"
+    },
+
+    "modal": {
+      "complianceType": "Standard Price Compliance - 01 (IMA_CC_PC_01)",
+      "description":    "TS-IMA-CC-PC_01"
+    },
+
+    "generalExtras": {
+      "group":           "McKesson Health Systems (MHS)",
+      "contractSubgroup": "Buying Group (BG)",
+      "origin":          "Supply Agreement (SA)"
+    },
+
+    "eligibilityRows": [
+      {
+        "salesOrg":       "8000",
+        "customerNumber": "166911"
+      }
+    ],
+
+    "calculationRows": [
+      {
+        "formula1":  "TIER_BPR: BPR",
+        "calcLevel1": "contract"
+      }
+    ],
+
+    "approvalStatus": "New"
+  }
+}
