@@ -136,6 +136,46 @@ export class CalculationSimulationPage {
   }
 
   /**
+   * Read the Calculation Simulation > Results grid after a run.
+   * The Final COGS is the only decimal value in the row (dates use "/" or "-",
+   * not decimals), so it's targeted directly; the simulation number is read as
+   * a best-effort extra.
+   */
+  async readResults(): Promise<{ finalCogs: string; simulationNumber: string; rowText: string }> {
+    await expect(this.page.getByText('Final COGS', { exact: false }).first())
+      .toBeVisible({ timeout: 60_000 });
+    await this.page.waitForTimeout(800);
+
+    // Final COGS — the lone decimal on the results row (e.g. "-3.00", "1,234.56").
+    let finalCogs = '';
+    const cogsCell = this.page.getByText(/^-?\d[\d,]*\.\d+$/).first();
+    if (await cogsCell.isVisible({ timeout: 20_000 }).catch(() => false)) {
+      finalCogs = (await cogsCell.textContent())?.trim() || '';
+    }
+
+    // Fallback: parse the row text and take the last number.
+    let rowText = '';
+    const row = this.page.locator('tr, [role="row"]').filter({ hasText: /-?\d[\d,]*\.\d+/ }).first();
+    if (await row.isVisible({ timeout: 3_000 }).catch(() => false)) {
+      rowText = (await row.textContent())?.trim().replace(/\s+/g, ' ') || '';
+      if (!finalCogs) {
+        const nums = rowText.match(/-?\d[\d,]*\.\d+/g) || [];
+        finalCogs = nums.length ? nums[nums.length - 1] : '';
+      }
+    }
+
+    // Simulation Number — best effort (first small integer link/cell).
+    let simulationNumber = '';
+    const simCell = this.page.getByRole('link', { name: /^\d+$/ }).first();
+    if (await simCell.isVisible({ timeout: 2_000 }).catch(() => false)) {
+      simulationNumber = (await simCell.textContent())?.trim() || '';
+    }
+
+    console.log(`[debug] Results — Final COGS: "${finalCogs}", Simulation #: "${simulationNumber}"`);
+    return { finalCogs, simulationNumber, rowText };
+  }
+
+  /**
    * Find the editable input belonging to a labelled filter row. Each row is
    * "Label | Equal | input"; we want the rightmost editable input (not the
    * "Equal" operator combobox).

@@ -1,4 +1,4 @@
-import { GeneralTabExtraData, ScaleData } from '@pages/PriceCompliancePage';
+import { GeneralTabExtraData, ScaleData } from '../pages/PriceCompliancePage';
 
 /**
  * Shape of a Price Compliance "create contract" JSON data file.
@@ -21,7 +21,12 @@ export interface PriceComplianceTestData {
     generalExtras: GeneralTabExtraData;
     eligibilityRows: Array<{
       salesOrg: string;
-      customerNumber: string;
+      customerNumber?: string;
+      customerChain?: string;
+      nationalGroup?: string;
+      subgroup?: string;
+      region?: string;
+      district?: string;
       validFrom?: string;
       validTo?: string;
     }>;
@@ -37,5 +42,10 @@ export interface PriceComplianceTestData {
       scale?: ScaleData;
     }>;
     approvalStatus: string;
+    simulation?: {
+      calcPeriodFrom: string;
+      calcPeriodTo: string;
+      expectedFinalCogs?: string;
+    };
   };
 }

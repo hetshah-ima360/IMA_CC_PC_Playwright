@@ -23,7 +23,12 @@ export interface EligibilityRow {
   validFrom: string;
   validTo: string;
   salesOrg: string;
-  customerNumber: string;
+  customerNumber?: string;
+  customerChain?: string;
+  nationalGroup?: string;
+  subgroup?: string;
+  region?: string;
+  district?: string;
 }
 
 export interface CalculationRow {
@@ -346,7 +351,12 @@ export class PriceCompliancePage {
     await this.fillHandsontableCell(rowIndex, 'Valid From', row.validFrom);
     await this.fillHandsontableCell(rowIndex, 'Valid To', row.validTo);
     await this.fillHandsontableDropdownCell(rowIndex, 'Sales Org', row.salesOrg);
-    await this.fillHandsontableDropdownCell(rowIndex, 'Customer Number', row.customerNumber);
+    if (row.customerNumber) await this.fillHandsontableDropdownCell(rowIndex, 'Customer Number', row.customerNumber);
+    if (row.customerChain) await this.fillHandsontableDropdownCell(rowIndex, 'Customer Chain', row.customerChain);
+    if (row.nationalGroup) await this.fillHandsontableDropdownCell(rowIndex, 'National Group', row.nationalGroup);
+    if (row.subgroup) await this.fillHandsontableDropdownCell(rowIndex, 'Sub Group', row.subgroup);
+    if (row.region) await this.fillHandsontableDropdownCell(rowIndex, 'Region', row.region);
+    if (row.district) await this.fillHandsontableDropdownCell(rowIndex, 'District', row.district);
     console.log('[debug] Eligibility row done');
   }
 

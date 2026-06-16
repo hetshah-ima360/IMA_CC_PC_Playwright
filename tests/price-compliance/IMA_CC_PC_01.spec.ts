@@ -13,33 +13,22 @@ import { appendSimulationResult } from '../../utils/resultsWriter';
 import { PriceComplianceTestData } from '../../utils/types';
 
 // ---- Data-driven: all values come from the JSON file, not from code ----
-import rawData from '../../data/TS-IMA-CC-PC_02_HS_Scaled_DSO.json';
+import rawData from '../../data/IMA_CC_PC_01.json';
 
 const data = rawData as unknown as PriceComplianceTestData;
 const pc = data.priceCompliance;
 const { startDate, endDate } = pc.dates;
 
 /**
- * Test: Create a CP&H COGS Audit Price Compliance contract with a multi-axis
- * SCALE (TIER_GCR: GX - FLU x TIER_BPR: BPR -> Outcome) on IMA360 Platform.
+ * Regression test 1 — IMA_CC_PC_01 (from CC_PC_Testing_Scenarios "Data" sheet).
  *
- * Flow:
- *   1. Log in
- *   2. Open Contract Compliance app
- *   3. Navigate: Price Compliance > Contract Setup
- *   4. Click Add (+) -> modal opens
- *   5. Fill modal (Compliance Type, Description, Start/End Date) -> confirm
- *   6. General tab: Exclusive Formula, Calc Frequency, Agreement Status,
- *      Group, Subgroup, Origin, Base DSO -> Next
- *   7. Eligibility Rules row -> Validate -> Next
- *   8. Calculation Rules: Formula 1 + Formula 2 (+ calc levels), then open the
- *      Scale popup, fill the scale grid, confirm -> Next
- *   9. Skip Notes -> Next
- *  10. Approval Status -> Save
+ * Standard Price Compliance contract with ONE eligibility row (National Group)
+ * and a SINGLE-AXIS GCR scale (LT/GT tiers). After save it reads the generated
+ * compliance number, runs a Calculation Simulation for the JSON's period, and
+ * stores the Final COGS under results/.
  */
-
-test.describe('Price Compliance — Calculation Simulation Test', () => {
-  test('Calculation Simulation Test - create PC_02 scaled contract then run simulation', async ({ page }) => {
+test.describe('Price Compliance — IMA_CC_PC_01 (Regression)', () => {
+  test('IMA_CC_PC_01 - create single-axis scaled contract then run simulation', async ({ page }) => {
     test.setTimeout(0);
     const username = process.env.IMA360_USERNAME;
     const password = process.env.IMA360_PASSWORD;
@@ -77,7 +66,7 @@ test.describe('Price Compliance — Calculation Simulation Test', () => {
     await pcPage.fillCreateModal(modalData);
     console.log('Modal filled and confirmed');
 
-    // ---- 6. General tab (extras + scaled-DSO fields) ----
+    // ---- 6. General tab ----
     const generalExtras: GeneralTabExtraData = {
       group: pc.generalExtras.group,
       contractSubgroup: pc.generalExtras.contractSubgroup,
@@ -102,6 +91,11 @@ test.describe('Price Compliance — Calculation Simulation Test', () => {
         validTo: row.validTo ?? endDate,
         salesOrg: row.salesOrg,
         customerNumber: row.customerNumber,
+        customerChain: row.customerChain,
+        nationalGroup: row.nationalGroup,
+        subgroup: row.subgroup,
+        region: row.region,
+        district: row.district,
       };
       await pcPage.fillEligibilityRow(eligibilityRow, i);
       console.log(`Eligibility row ${i} filled`);
@@ -161,33 +155,28 @@ test.describe('Price Compliance — Calculation Simulation Test', () => {
     const complianceNumber = await pcPage.getComplianceNumberFromList();
     console.log(`\n>>> Compliance Number created: ${complianceNumber}\n`);
 
-    // ---- 12. Calculation Simulation: July 2024 + the fetched compliance number ----
+    // ---- 12. Calculation Simulation (period from JSON) ----
     await launcher.openPriceComplianceCalculationSimulation();
     console.log('Navigated to Price Compliance > Calculation Simulation');
 
+    const calcPeriodFrom = pc.simulation?.calcPeriodFrom ?? '07/01/2024';
+    const calcPeriodTo = pc.simulation?.calcPeriodTo ?? '07/31/2024';
+
     const sim = new CalculationSimulationPage(page);
-    const calcPeriodFrom = '07/01/2024';
-    const calcPeriodTo = '07/31/2024';
-    await sim.runSimulation({
-      calcPeriodFrom,
-      calcPeriodTo,
-      complianceNumber,                 // fetched from the Contract Setup list
-      // Contract Type intentionally left empty — the recording uses only the
-      // Compliance Number to identify the contract.
-    });
+    await sim.runSimulation({ calcPeriodFrom, calcPeriodTo, complianceNumber });
     console.log('Calculation Simulation run completed');
 
-    // ---- 13. Read the Final COGS result and store it in results/ ----
+    // ---- 13. Read Final COGS and store under results/ ----
     const { finalCogs, simulationNumber } = await sim.readResults();
     appendSimulationResult({
-      scenario: 'TS-IMA-CC-PC_02',
-      contractNumber: complianceNumber,   // already known from Contract Setup
-      description: pc.modal.description,   // contract description, used in the filename
+      scenario: 'IMA_CC_PC_01',
+      contractNumber: complianceNumber,
+      description: pc.modal.description,
       calcPeriodFrom,
       calcPeriodTo,
       finalCogs,
       simulationNumber,
     });
-    console.log(`>>> Final COGS for contract ${complianceNumber}: ${finalCogs}`);
+    console.log(`>>> Final COGS for contract ${complianceNumber}: ${finalCogs} (expected ${pc.simulation?.expectedFinalCogs ?? 'n/a'})`);
   });
 });

@@ -1,0 +1,58 @@
+{
+  "_comment": "Test 1 (IMA_CC_PC_01) from CC_PC_Testing_Scenarios 'Data' sheet. Single-axis GCR scale (LT/GT tiers). One eligibility row (National Group 1000). Expected Final COGS for July 2024 = -0.0575.",
+  "priceCompliance": {
+    "dates": {
+      "startDate": "01/01/2024",
+      "endDate": "12/31/2026"
+    },
+    "modal": {
+      "complianceType": "Standard Price Compliance - 01 (IMA_CC_PC_01)",
+      "description": "IMA_CC_PC_01"
+    },
+    "generalExtras": {
+      "sourceDataType": "Direct - Sales Data (Direct - Sales Data)",
+      "calculationFrequency": "02 (Quarterly (Jan - Mar))",
+      "group": "McKesson Health Systems (MHS)",
+      "contractSubgroup": "Buying Group (BG)",
+      "origin": "Supply Agreement (SA)"
+    },
+    "eligibilityRows": [
+      {
+        "salesOrg": "8000",
+        "nationalGroup": "1000"
+      }
+    ],
+    "calculationRows": [
+      {
+        "formula1": "TIER_GCR: GX - FLU",
+        "calcLevel1": "contract",
+        "scale": {
+          "columns": {
+            "axes": [
+              { "operator": 2, "value": 3, "unit": 4 }
+            ],
+            "scaleValue": 5,
+            "scaleUnit": 6
+          },
+          "rows": [
+            { "axes": [ { "operator": "LT", "value": "2.99", "unit": "% (%)" } ], "scaleValue": "-2.5", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "LT", "value": "4.99", "unit": "% (%)" } ], "scaleValue": "-3", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "LT", "value": "5.99", "unit": "% (%)" } ], "scaleValue": "-3.75", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "LT", "value": "6.99", "unit": "% (%)" } ], "scaleValue": "-4.25", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "LT", "value": "7.99", "unit": "% (%)" } ], "scaleValue": "-4.75", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "LT", "value": "8.99", "unit": "% (%)" } ], "scaleValue": "-5", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "LT", "value": "9.99", "unit": "% (%)" } ], "scaleValue": "-5.25", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "LT", "value": "11.99", "unit": "% (%)" } ], "scaleValue": "-5.55", "scaleUnit": "% (%)" },
+            { "axes": [ { "operator": "GT", "value": "12", "unit": "% (%)" } ], "scaleValue": "-5.75", "scaleUnit": "% (%)" }
+          ]
+        }
+      }
+    ],
+    "approvalStatus": "New",
+    "simulation": {
+      "calcPeriodFrom": "07/01/2024",
+      "calcPeriodTo": "07/31/2024",
+      "expectedFinalCogs": "-0.0575"
+    }
+  }
+}
