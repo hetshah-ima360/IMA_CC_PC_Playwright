@@ -1,17 +1,18 @@
 import { test } from '@playwright/test';
-import { LoginPage } from '@pages/LoginPage';
-import { AppLauncherPage } from '@pages/AppLauncherPage';
+import { LoginPage } from '../../pages/LoginPage';
+import { AppLauncherPage } from '../../pages/AppLauncherPage';
 import {
   PriceCompliancePage,
   CreateModalData,
   GeneralTabExtraData,
   EligibilityRow,
   CalculationRow,
-} from '@pages/PriceCompliancePage';
-import { PriceComplianceTestData } from '@utils/types';
+} from '../../pages/PriceCompliancePage';
+import { CalculationSimulationPage } from '../../pages/CalculationSimulationPage';
+import { PriceComplianceTestData } from '../../utils/types';
 
 // ---- Data-driven: all values come from the JSON file, not from code ----
-import rawData from '@data/TS-IMA-CC-PC_02_HS_Scaled_DSO.json';
+import rawData from '../../data/TS-IMA-CC-PC_02_HS_Scaled_DSO.json';
 
 const data = rawData as unknown as PriceComplianceTestData;
 const pc = data.priceCompliance;
@@ -36,8 +37,8 @@ const { startDate, endDate } = pc.dates;
  *  10. Approval Status -> Save
  */
 
-test.describe('Price Compliance - CP&H COGS Audit (Scaled DSO)', () => {
-  test('TS-IMA-CC-PC_02 - Create a scaled multi-axis Price Compliance contract', async ({ page }) => {
+test.describe('Price Compliance — Calculation Simulation Test', () => {
+  test('Calculation Simulation Test - create PC_02 scaled contract then run simulation', async ({ page }) => {
     test.setTimeout(0);
     const username = process.env.IMA360_USERNAME;
     const password = process.env.IMA360_PASSWORD;
@@ -152,11 +153,25 @@ test.describe('Price Compliance - CP&H COGS Audit (Scaled DSO)', () => {
     await pcPage.assertSaveSuccessful();
     console.log('Save successful!');
 
-    try {
-      const complianceNumber = await pcPage.getComplianceNumber();
-      console.log(`\n>>> Compliance Number created: ${complianceNumber}\n`);
-    } catch {
-      // not fatal
-    }
+    // ---- 11. Go to Contract Setup; the new contract is the top row ----
+    await launcher.openPriceComplianceContractSetup();
+    console.log('Back on Contract Setup list');
+
+    const complianceNumber = await pcPage.getComplianceNumberFromList();
+    console.log(`\n>>> Compliance Number created: ${complianceNumber}\n`);
+
+    // ---- 12. Calculation Simulation: July 2024 + the fetched compliance number ----
+    await launcher.openPriceComplianceCalculationSimulation();
+    console.log('Navigated to Price Compliance > Calculation Simulation');
+
+    const sim = new CalculationSimulationPage(page);
+    await sim.runSimulation({
+      calcPeriodFrom: '07/01/2024',
+      calcPeriodTo: '07/31/2024',
+      complianceNumber,                 // fetched from the Contract Setup list
+      // Contract Type intentionally left empty — the recording uses only the
+      // Compliance Number to identify the contract.
+    });
+    console.log('Calculation Simulation run completed');
   });
 });

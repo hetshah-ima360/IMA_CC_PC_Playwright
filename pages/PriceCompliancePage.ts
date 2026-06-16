@@ -753,4 +753,49 @@ export class PriceCompliancePage {
     await expect(field).not.toHaveValue('', { timeout: 30_000 });
     return (await field.inputValue()).trim();
   }
+
+  /**
+   * Read the newly-created contract's compliance id from the Contract Setup
+   * list (price-compliance-list). The list is sorted newest-first, so the top
+   * row is the just-created contract. Its Compliance Number cell renders as
+   * "HS_Scaled_DSO_Test3 (148)" — the only text on the page that ends in
+   * "(<digits>)" — so we match that and return the number in parentheses.
+   */
+  async getComplianceNumberFromList(): Promise<string> {
+    await this.page.waitForURL(/price-compliance-list/i, { timeout: 30_000 }).catch(() => {});
+    await this.page.waitForLoadState('networkidle', { timeout: 20_000 }).catch(() => {});
+    await this.page.waitForTimeout(1_000);
+
+    // Compliance Number cells render as "<description> (<id>)". Other parenthetical
+    // text on the page (e.g. "CP&H COGS Audit (CP&H COGS Audit)") is NOT digits,
+    // so anchoring on "(<digits>)" at the end uniquely targets these cells.
+    const candidates: Locator[] = [
+      this.page.getByText(/\(\d+\)\s*$/),
+      this.page.getByRole('link', { name: /\(\d+\)/ }),
+      this.page.locator('a, [role="link"], [role="gridcell"], td, span')
+        .filter({ hasText: /\(\d+\)\s*$/ }),
+    ];
+
+    for (let s = 0; s < candidates.length; s++) {
+      const loc = candidates[s].first();
+      try {
+        await loc.waitFor({ state: 'visible', timeout: s === 0 ? 15_000 : 4_000 });
+        const text = (await loc.textContent())?.trim() || '';
+        const m = text.match(/\((\d+)\)/);
+        if (m) {
+          console.log(`[debug] Top contract (strategy ${s + 1}): "${text}" -> compliance id ${m[1]}`);
+          return m[1];
+        }
+        console.log(`[debug] strategy ${s + 1} matched "${text}" but had no (id)`);
+      } catch {
+        console.log(`[debug] strategy ${s + 1} found nothing`);
+      }
+    }
+
+    const count = await this.page.getByText(/\(\d+\)\s*$/).count().catch(() => -1);
+    throw new Error(
+      `Could not read a compliance number from the Contract Setup list ` +
+      `(${count} "(id)" text matches found). The cell selector needs tuning.`,
+    );
+  }
 }
