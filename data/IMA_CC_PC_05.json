@@ -1,5 +1,5 @@
 {
-  "_comment": "Sheet3 test 1 (IMA_CC_PC_01). Auto-generated from CC_PC_Testing_Scenarios 'Data'->Sheet3.",
+  "_comment": "Sheet3 test 5 (IMA_CC_PC_05). Auto-generated from CC_PC_Testing_Scenarios 'Data'->Sheet3.",
   "priceCompliance": {
     "dates": {
       "startDate": "01/01/2024",
@@ -7,25 +7,27 @@
     },
     "modal": {
       "complianceType": "CP&H COGS Audit (CP&H COGS Audit)",
-      "description": "IMA_CC_PC_01"
+      "description": "IMA_CC_PC_05"
     },
     "generalExtras": {
       "sourceDataType": "Direct - Sales Data (Direct - Sales Data)",
       "calculationFrequency": "02 (Quarterly (Jan - Mar))",
-      "group": "McKesson Health Systems (MHS)",
-      "contractSubgroup": "Buying Group (BG)",
+      "group": "(CPH)",
+      "contractSubgroup": "(IND)",
       "origin": "Supply Agreement (SA)"
     },
     "eligibilityRows": [
       {
         "salesOrg": "8000",
-        "nationalGroup": "1000"
+        "nationalGroup": "0899"
       }
     ],
     "calculationRows": [
       {
-        "formula1": "NET SALES - NET FEES",
-        "calcLevel1": "contract",
+        "formula1": "NET SALES - MPB - NET FEES",
+        "calcLevel1": ["contract"],
+        "formula2": "TIER_GCR:GX- DS- FEE",
+        "calcLevel2": ["contract"],
         "scale": {
           "columns": {
             "axes": [
@@ -33,18 +35,28 @@
                 "operator": 2,
                 "value": 3,
                 "unit": 4
+              },
+              {
+                "operator": 5,
+                "value": 6,
+                "unit": 7
               }
             ],
-            "scaleValue": 5,
-            "scaleUnit": 6
+            "scaleValue": 8,
+            "scaleUnit": 9
           },
           "rows": [
             {
               "axes": [
                 {
                   "operator": "GE",
-                  "value": "10000",
+                  "value": "1000",
                   "unit": "USD (USD)"
+                },
+                {
+                  "operator": "GE",
+                  "value": "15",
+                  "unit": "% (%)"
                 }
               ],
               "scaleValue": "-0.25",
@@ -54,22 +66,32 @@
               "axes": [
                 {
                   "operator": "GE",
-                  "value": "15000",
+                  "value": "1500",
                   "unit": "USD (USD)"
+                },
+                {
+                  "operator": "GE",
+                  "value": "20",
+                  "unit": "% (%)"
                 }
               ],
-              "scaleValue": "-0.3",
+              "scaleValue": "-0.5",
               "scaleUnit": "% (%)"
             },
             {
               "axes": [
                 {
                   "operator": "GE",
-                  "value": "20000",
+                  "value": "2000",
                   "unit": "USD (USD)"
+                },
+                {
+                  "operator": "GE",
+                  "value": "25",
+                  "unit": "% (%)"
                 }
               ],
-              "scaleValue": "-0.35",
+              "scaleValue": "-1",
               "scaleUnit": "% (%)"
             }
           ]
@@ -79,8 +101,7 @@
     "approvalStatus": "New",
     "simulation": {
       "calcPeriodFrom": "07/01/2024",
-      "calcPeriodTo": "07/31/2024",
-      "expectedFinalCogs": "-0.0575"
+      "calcPeriodTo": "07/31/2024"
     }
   }
 }

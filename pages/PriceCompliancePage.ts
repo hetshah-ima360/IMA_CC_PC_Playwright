@@ -712,6 +712,10 @@ export class PriceCompliancePage {
    * Click a dropdown cell, open the picker, and select the matching option.
    */
   private async fillHandsontableDropdownCell(rowIndex: number, columnName: string, value: string) {
+    // Defensive: a JSON value may arrive as an array (e.g. ["contract"]) or a
+    // number — coerce to a single string so matching/typing never crashes.
+    value = (Array.isArray(value as unknown) ? (value as unknown as unknown[])[0] : value) as string;
+    value = String(value ?? '');
     console.log(`[debug] Setting ${columnName} (dropdown) = "${value}" in row ${rowIndex + 1}`);
     const cell = await this.locateHandsontableCell(rowIndex, columnName);
     await cell.scrollIntoViewIfNeeded();
@@ -722,40 +726,86 @@ export class PriceCompliancePage {
     await cell.dblclick();
     await this.page.waitForTimeout(400);
 
-    const optSel = '[role="option"], li, .htAutocompleteArrow ~ * li, .ht_master tr td';
-    const matcher = new RegExp(this.escapeRegex(value), 'i');
+    // Option rows live in the dropdown popup. Include checkbox-style options
+    // (e.g. Calc Level: "2 (customer_number)") and plain list options. NOTE we
+    // deliberately exclude ".ht_master tr td" so grid cells aren't mistaken for
+    // options (that caused false matches like the cell already showing "contract").
+    const optSel = '[role="option"], [role="menuitemcheckbox"], label, li, .htAutocompleteArrow ~ * li';
+    // Tolerant matcher: allow flexible whitespace around ":" and "-" so values
+    // like "TIER_GCR: GCR" still match "TIER_GCR : GCR" / "TIER_GCR:GCR".
+    const flexible = this.escapeRegex(value)
+      .replace(/\s*:\s*/g, '\\s*:\\s*')
+      .replace(/\s*-\s*/g, '\\s*-\\s*')
+      .replace(/\s+/g, '\\s+');
+    const matcher = new RegExp(flexible, 'i');
     const findOption = () => this.page.locator(optSel).filter({ hasText: matcher }).first();
 
-    // Some lists (e.g. Customer Number) load asynchronously after the prior
-    // column is set, so the option may not appear immediately. Type to filter,
-    // then retry the filter a couple of times while the list populates.
-    for (let attempt = 0; attempt < 3; attempt++) {
-      if (attempt === 0) {
+    // Match strategy across attempts:
+    //   0: open list, no typing (short lists like Calc Level show all options)
+    //   1: type the value to filter (async lists like Customer Number)
+    //   2: clear + retype (list may have just loaded)
+    //   3: clear the filter entirely and match against the full list
+    for (let attempt = 0; attempt < 4; attempt++) {
+      if (attempt === 1) {
         await this.page.keyboard.type(value, { delay: 30 });
-      } else {
+      } else if (attempt === 2) {
         console.log(`[debug]   "${value}" not visible yet — re-filtering (attempt ${attempt + 1})`);
         await this.page.keyboard.press('Control+A').catch(() => {});
         await this.page.keyboard.press('Backspace').catch(() => {});
         await this.page.waitForTimeout(300);
         await this.page.keyboard.type(value, { delay: 30 });
+      } else if (attempt === 3) {
+        console.log(`[debug]   "${value}" still not visible — matching against full list (attempt ${attempt + 1})`);
+        await this.page.keyboard.press('Control+A').catch(() => {});
+        await this.page.keyboard.press('Backspace').catch(() => {});
+        await this.page.waitForTimeout(400);
       }
+      await this.page.waitForTimeout(attempt === 0 ? 250 : 300);
       try {
-        await findOption().waitFor({ state: 'visible', timeout: 6_000 });
-        await findOption().click();
+        const opt = findOption();
+        await opt.waitFor({ state: 'visible', timeout: 5_000 });
+        const cb = opt.locator('input[type="checkbox"]');
+        if ((await cb.count()) > 0) {
+          // Checkbox-style option (e.g. Calc Level). Only click if not already
+          // selected, so we don't toggle off a default like "contract".
+          const alreadyChecked = await cb.first().isChecked().catch(() => false);
+          if (!alreadyChecked) {
+            await opt.click();
+          }
+          await this.page.waitForTimeout(150);
+          await this.page.keyboard.press('Escape').catch(() => {}); // close the popup to commit
+        } else {
+          await opt.click();
+        }
         await this.page.waitForTimeout(200);
         return;
       } catch {
-        await this.page.waitForTimeout(600);
+        await this.page.waitForTimeout(400);
       }
     }
+    // On total failure, clear the filter and dump the real options to the log
+    // so the exact label can be copied into the JSON.
+    let available: string[] = [];
+    try {
+      await this.page.keyboard.press('Control+A').catch(() => {});
+      await this.page.keyboard.press('Backspace').catch(() => {});
+      await this.page.waitForTimeout(500);
+      available = (await this.page.locator(optSel).filter({ hasText: /\S/ }).allTextContents())
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .slice(0, 50);
+    } catch {
+      /* ignore */
+    }
+    console.log(`[debug] Available "${columnName}" options: ${JSON.stringify(available)}`);
     throw new Error(
-      `Dropdown option "${value}" not found for "${columnName}" (row ${rowIndex + 1}) after 3 attempts — ` +
-      `the value may not be a valid option for this contract.`,
+      `Dropdown option "${value}" not found for "${columnName}" (row ${rowIndex + 1}) after 3 attempts. ` +
+      `Available options seen: ${JSON.stringify(available)}`,
     );
   }
 
   private escapeRegex(s: string): string {
-    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   async getComplianceNumber(): Promise<string> {

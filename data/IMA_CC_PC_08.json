@@ -1,0 +1,38 @@
+{
+  "_comment": "Sheet3 test 8 (IMA_CC_PC_08). Auto-generated from CC_PC_Testing_Scenarios 'Data'->Sheet3.",
+  "priceCompliance": {
+    "dates": {
+      "startDate": "01/01/2024",
+      "endDate": "12/31/2026"
+    },
+    "modal": {
+      "complianceType": "CP&H COGS Audit (CP&H COGS Audit)",
+      "description": "IMA_CC_PC_08"
+    },
+    "generalExtras": {
+      "sourceDataType": "Direct - Sales Data (Direct - Sales Data)",
+      "calculationFrequency": "02 (Quarterly (Jan - Mar))",
+      "group": "(CPH)",
+      "contractSubgroup": "Buying Group (BG)",
+      "origin": "(MCF)"
+    },
+    "eligibilityRows": [
+      {
+        "salesOrg": "8000",
+        "nationalGroup": "0230",
+        "subgroup": "000084"
+      }
+    ],
+    "calculationRows": [
+      {
+        "formula1": "NET SALES + MPB - NET FEES",
+        "calcLevel1": "customer_number"
+      }
+    ],
+    "approvalStatus": "New",
+    "simulation": {
+      "calcPeriodFrom": "07/01/2024",
+      "calcPeriodTo": "07/31/2024"
+    }
+  }
+}

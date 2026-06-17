@@ -141,15 +141,46 @@ export class CalculationSimulationPage {
    * not decimals), so it's targeted directly; the simulation number is read as
    * a best-effort extra.
    */
-  async readResults(): Promise<{ finalCogs: string; simulationNumber: string; rowText: string }> {
-    await expect(this.page.getByText('Final COGS', { exact: false }).first())
-      .toBeVisible({ timeout: 60_000 });
-    await this.page.waitForTimeout(800);
+  async readResults(): Promise<{ finalCogs: string; simulationNumber: string; rowText: string; status: string }> {
+    // After Run, the simulation computes server-side and then navigates to the
+    // Results grid — this can be slow (a minute or more). A returned value of
+    // "0.00" is a REAL result, not "no result". Wait generously for the grid.
+    const cogsHeader = this.page.getByText('Final COGS', { exact: false }).first();
+    const onResults = await cogsHeader.isVisible({ timeout: 180_000 }).catch(() => false);
 
-    // Final COGS — the lone decimal on the results row (e.g. "-3.00", "1,234.56").
+    if (!onResults) {
+      const url = this.page.url();
+      const onResultsCrumb = await this.page.getByText(/Results/i).first().isVisible().catch(() => false);
+      let noData = '';
+      for (const re of [/no\s*(records|results|data)/i, /nothing to display/i]) {
+        const m = this.page.getByText(re).first();
+        if (await m.isVisible({ timeout: 1_000 }).catch(() => false)) {
+          noData = (await m.textContent())?.trim() || '';
+          break;
+        }
+      }
+      console.log(`[debug] No "Final COGS" detected after 180s. url=${url} resultsBreadcrumb=${onResultsCrumb} message="${noData}"`);
+      return { finalCogs: '', simulationNumber: '', rowText: noData, status: 'NO_RESULT' };
+    }
+
+    await this.page.waitForTimeout(1_000);
+
+    // The Final COGS column is at the far right and the grid may only render
+    // columns that are scrolled into view — nudge every horizontal scroller to
+    // the end and bring the header into view so its cell is rendered.
+    await this.page.evaluate(() => {
+      for (const el of Array.from(document.querySelectorAll('*')) as HTMLElement[]) {
+        if (el.scrollWidth > el.clientWidth + 40) el.scrollLeft = el.scrollWidth;
+      }
+    }).catch(() => {});
+    await cogsHeader.scrollIntoViewIfNeeded().catch(() => {});
+    await this.page.waitForTimeout(600);
+
+    // Final COGS — the lone decimal on the results row (e.g. "0.00", "-3.00").
     let finalCogs = '';
     const cogsCell = this.page.getByText(/^-?\d[\d,]*\.\d+$/).first();
-    if (await cogsCell.isVisible({ timeout: 20_000 }).catch(() => false)) {
+    if (await cogsCell.isVisible({ timeout: 30_000 }).catch(() => false)) {
+      await cogsCell.scrollIntoViewIfNeeded().catch(() => {});
       finalCogs = (await cogsCell.textContent())?.trim() || '';
     }
 
@@ -164,15 +195,17 @@ export class CalculationSimulationPage {
       }
     }
 
-    // Simulation Number — best effort (first small integer link/cell).
+    // Simulation Number — best effort (first integer-only link/cell).
     let simulationNumber = '';
     const simCell = this.page.getByRole('link', { name: /^\d+$/ }).first();
     if (await simCell.isVisible({ timeout: 2_000 }).catch(() => false)) {
       simulationNumber = (await simCell.textContent())?.trim() || '';
     }
 
-    console.log(`[debug] Results — Final COGS: "${finalCogs}", Simulation #: "${simulationNumber}"`);
-    return { finalCogs, simulationNumber, rowText };
+    // "0.00" is a valid result, so status is OK whenever the grid rendered a value.
+    const status = finalCogs !== '' ? 'OK' : 'EMPTY';
+    console.log(`[debug] Results — Final COGS: "${finalCogs}", Simulation #: "${simulationNumber}", status: ${status}`);
+    return { finalCogs, simulationNumber, rowText, status };
   }
 
   /**

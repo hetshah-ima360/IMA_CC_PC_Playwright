@@ -23,12 +23,18 @@ export default defineConfig({
     actionTimeout: 25 * 1000,
     navigationTimeout: 60 * 1000,
     headless: false,
-    viewport: { width: 1440, height: 900 },
+    viewport: null,
+    launchOptions: { args: ['--start-maximized'] },
   },
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: null,
+        deviceScaleFactor: undefined,
+        launchOptions: { args: ['--start-maximized'] },
+      },
     },
   ],
 });

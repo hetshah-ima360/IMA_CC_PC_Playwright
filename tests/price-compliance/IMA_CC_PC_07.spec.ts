@@ -12,19 +12,19 @@ import { CalculationSimulationPage } from '../../pages/CalculationSimulationPage
 import { appendSimulationResult } from '../../utils/resultsWriter';
 import { PriceComplianceTestData } from '../../utils/types';
 
-import rawData from '../../data/IMA_CC_PC_01.json';
+import rawData from '../../data/IMA_CC_PC_07.json';
 
 const data = rawData as unknown as PriceComplianceTestData;
 const pc = data.priceCompliance;
 const { startDate, endDate } = pc.dates;
 
 /**
- * Regression — IMA_CC_PC_01 (from CC_PC_Testing_Scenarios "Sheet3").
+ * Regression — IMA_CC_PC_07 (from CC_PC_Testing_Scenarios "Sheet3").
  * Create the contract, then run a Calculation Simulation and store the
  * Final COGS under results/.
  */
-test.describe('Price Compliance — IMA_CC_PC_01 (Regression)', () => {
-  test('IMA_CC_PC_01 - create contract then run simulation', async ({ page }) => {
+test.describe('Price Compliance — IMA_CC_PC_07 (Regression)', () => {
+  test('IMA_CC_PC_07 - create contract then run simulation', async ({ page }) => {
     test.setTimeout(0);
     const username = process.env.IMA360_USERNAME;
     const password = process.env.IMA360_PASSWORD;
@@ -134,7 +134,7 @@ test.describe('Price Compliance — IMA_CC_PC_01 (Regression)', () => {
 
     const { finalCogs, simulationNumber } = await sim.readResults();
     appendSimulationResult({
-      scenario: 'IMA_CC_PC_01',
+      scenario: 'IMA_CC_PC_07',
       contractNumber: complianceNumber,
       description: pc.modal.description,
       calcPeriodFrom,

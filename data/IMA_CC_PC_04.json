@@ -1,5 +1,5 @@
 {
-  "_comment": "Sheet3 test 1 (IMA_CC_PC_01). Auto-generated from CC_PC_Testing_Scenarios 'Data'->Sheet3.",
+  "_comment": "Sheet3 test 4 (IMA_CC_PC_04). Auto-generated from CC_PC_Testing_Scenarios 'Data'->Sheet3.",
   "priceCompliance": {
     "dates": {
       "startDate": "01/01/2024",
@@ -7,7 +7,7 @@
     },
     "modal": {
       "complianceType": "CP&H COGS Audit (CP&H COGS Audit)",
-      "description": "IMA_CC_PC_01"
+      "description": "IMA_CC_PC_04"
     },
     "generalExtras": {
       "sourceDataType": "Direct - Sales Data (Direct - Sales Data)",
@@ -19,13 +19,13 @@
     "eligibilityRows": [
       {
         "salesOrg": "8000",
-        "nationalGroup": "1000"
+        "nationalGroup": "0899"
       }
     ],
     "calculationRows": [
       {
-        "formula1": "NET SALES - NET FEES",
-        "calcLevel1": "contract",
+        "formula1": "TIER_GCR:GX- SPC - GLP1 - DS - FEE",
+        "calcLevel1": "customer_number",
         "scale": {
           "columns": {
             "axes": [
@@ -43,8 +43,8 @@
               "axes": [
                 {
                   "operator": "GE",
-                  "value": "10000",
-                  "unit": "USD (USD)"
+                  "value": "30",
+                  "unit": "% (%)"
                 }
               ],
               "scaleValue": "-0.25",
@@ -54,22 +54,22 @@
               "axes": [
                 {
                   "operator": "GE",
-                  "value": "15000",
-                  "unit": "USD (USD)"
+                  "value": "32",
+                  "unit": "% (%)"
                 }
               ],
-              "scaleValue": "-0.3",
+              "scaleValue": "-0.5",
               "scaleUnit": "% (%)"
             },
             {
               "axes": [
                 {
                   "operator": "GE",
-                  "value": "20000",
-                  "unit": "USD (USD)"
+                  "value": "34",
+                  "unit": "% (%)"
                 }
               ],
-              "scaleValue": "-0.35",
+              "scaleValue": "-1",
               "scaleUnit": "% (%)"
             }
           ]
@@ -79,8 +79,7 @@
     "approvalStatus": "New",
     "simulation": {
       "calcPeriodFrom": "07/01/2024",
-      "calcPeriodTo": "07/31/2024",
-      "expectedFinalCogs": "-0.0575"
+      "calcPeriodTo": "07/31/2024"
     }
   }
 }

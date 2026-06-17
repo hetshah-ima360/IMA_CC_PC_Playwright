@@ -1,5 +1,5 @@
 {
-  "_comment": "Sheet3 test 1 (IMA_CC_PC_01). Auto-generated from CC_PC_Testing_Scenarios 'Data'->Sheet3.",
+  "_comment": "Sheet3 test 9 (IMA_CC_PC_09). Auto-generated from CC_PC_Testing_Scenarios 'Data'->Sheet3.",
   "priceCompliance": {
     "dates": {
       "startDate": "01/01/2024",
@@ -7,25 +7,26 @@
     },
     "modal": {
       "complianceType": "CP&H COGS Audit (CP&H COGS Audit)",
-      "description": "IMA_CC_PC_01"
+      "description": "IMA_CC_PC_09"
     },
     "generalExtras": {
       "sourceDataType": "Direct - Sales Data (Direct - Sales Data)",
       "calculationFrequency": "02 (Quarterly (Jan - Mar))",
-      "group": "McKesson Health Systems (MHS)",
+      "group": "(CPH)",
       "contractSubgroup": "Buying Group (BG)",
-      "origin": "Supply Agreement (SA)"
+      "origin": "(MCF)"
     },
     "eligibilityRows": [
       {
         "salesOrg": "8000",
-        "nationalGroup": "1000"
+        "nationalGroup": "0230",
+        "subgroup": "000084"
       }
     ],
     "calculationRows": [
       {
-        "formula1": "NET SALES - NET FEES",
-        "calcLevel1": "contract",
+        "formula1": "NET SALES + MPB - NET FEES",
+        "calcLevel1": "customer_number",
         "scale": {
           "columns": {
             "axes": [
@@ -47,30 +48,8 @@
                   "unit": "USD (USD)"
                 }
               ],
-              "scaleValue": "-0.25",
-              "scaleUnit": "% (%)"
-            },
-            {
-              "axes": [
-                {
-                  "operator": "GE",
-                  "value": "15000",
-                  "unit": "USD (USD)"
-                }
-              ],
-              "scaleValue": "-0.3",
-              "scaleUnit": "% (%)"
-            },
-            {
-              "axes": [
-                {
-                  "operator": "GE",
-                  "value": "20000",
-                  "unit": "USD (USD)"
-                }
-              ],
-              "scaleValue": "-0.35",
-              "scaleUnit": "% (%)"
+              "scaleValue": "100",
+              "scaleUnit": "USD (USD)"
             }
           ]
         }
@@ -79,8 +58,7 @@
     "approvalStatus": "New",
     "simulation": {
       "calcPeriodFrom": "07/01/2024",
-      "calcPeriodTo": "07/31/2024",
-      "expectedFinalCogs": "-0.0575"
+      "calcPeriodTo": "07/31/2024"
     }
   }
 }

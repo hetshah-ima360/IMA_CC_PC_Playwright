@@ -1,5 +1,5 @@
 {
-  "_comment": "Sheet3 test 1 (IMA_CC_PC_01). Auto-generated from CC_PC_Testing_Scenarios 'Data'->Sheet3.",
+  "_comment": "Sheet3 test 2 (IMA_CC_PC_02). Auto-generated from CC_PC_Testing_Scenarios 'Data'->Sheet3.",
   "priceCompliance": {
     "dates": {
       "startDate": "01/01/2024",
@@ -7,7 +7,7 @@
     },
     "modal": {
       "complianceType": "CP&H COGS Audit (CP&H COGS Audit)",
-      "description": "IMA_CC_PC_01"
+      "description": "IMA_CC_PC_02"
     },
     "generalExtras": {
       "sourceDataType": "Direct - Sales Data (Direct - Sales Data)",

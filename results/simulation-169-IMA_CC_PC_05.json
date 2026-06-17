@@ -1,0 +1,10 @@
+{
+  "scenario": "IMA_CC_PC_05",
+  "contractNumber": "169",
+  "description": "IMA_CC_PC_05",
+  "calcPeriodFrom": "07/01/2024",
+  "calcPeriodTo": "07/31/2024",
+  "finalCogs": "0.00",
+  "simulationNumber": "",
+  "runAt": "2026-06-17T17:13:21.815Z"
+}
